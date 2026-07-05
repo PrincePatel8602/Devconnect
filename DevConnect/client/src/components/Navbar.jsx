@@ -54,7 +54,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-10 text-2xl">
 
                     <Link
-                        to="/"
+                        to="/Home"
                         className={active("/Home")}
                     >
                         <FaHome />
