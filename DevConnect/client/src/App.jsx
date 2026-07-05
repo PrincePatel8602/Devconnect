@@ -17,65 +17,64 @@ function App() {
         <BrowserRouter>
             <Routes>
 
-                <Route path="/login" element={<Login />} />
+    <Route path="/" element={<Login />} />
+    <Route path="/register" element={<Register />} />
 
-                <Route path="/register" element={<Register />} />
+    <Route
+        path="/home"
+        element={
+            <ProtectedRoute>
+                <Home />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/"
-                    element={
-                        <ProtectedRoute>
-                            <Home />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/profile/:username"
+        element={
+            <ProtectedRoute>
+                <Profile />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/profile/:username"
-                    element={
-                        <ProtectedRoute>
-                            <Profile />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/chat"
+        element={
+            <ProtectedRoute>
+                <Chat />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/chat"
-                    element={
-                        <ProtectedRoute>
-                            <Chat />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/reels"
+        element={
+            <ProtectedRoute>
+                <Reels />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/reels"
-                    element={
-                        <ProtectedRoute>
-                            <Reels />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/notifications"
+        element={
+            <ProtectedRoute>
+                <Notifications />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/notifications"
-                    element={
-                        <ProtectedRoute>
-                            <Notifications />
-                        </ProtectedRoute>
-                    }
-                />
+    <Route
+        path="/search"
+        element={
+            <ProtectedRoute>
+                <Search />
+            </ProtectedRoute>
+        }
+    />
 
-                <Route
-                    path="/search"
-                    element={
-                        <ProtectedRoute>
-                            <Search />
-                        </ProtectedRoute>
-                    }
-                />
-
-            </Routes>
+</Routes>
         </BrowserRouter>
     );
 }

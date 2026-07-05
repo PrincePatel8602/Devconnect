@@ -76,7 +76,7 @@ export default function Login() {
 
             login(res.data);
 
-            navigate("/");
+            navigate("/Home");
 
         } catch (err) {
 
