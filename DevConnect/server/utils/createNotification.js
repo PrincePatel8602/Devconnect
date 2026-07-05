@@ -1,0 +1,42 @@
+import Notification from "../models/Notification.js";
+
+export const createNotification = async ({
+    recipient,
+    sender,
+    type,
+    post = null,
+    message = null,
+    io = null,
+}) => {
+
+    if (recipient.toString() === sender.toString()) return;
+
+    const notification = await Notification.create({
+
+        recipient,
+        sender,
+        type,
+        post,
+        message,
+
+    });
+
+    const populatedNotification =
+        await Notification.findById(notification._id)
+            .populate(
+                "sender",
+                "fullName username profilePic"
+            );
+
+    if (io) {
+
+        io.to(recipient.toString()).emit(
+            "newNotification",
+            populatedNotification
+        );
+
+    }
+
+    return populatedNotification;
+
+};
