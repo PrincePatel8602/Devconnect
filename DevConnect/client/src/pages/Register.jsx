@@ -239,7 +239,7 @@ export default function Register() {
                     Already have an account?{" "}
 
                     <Link
-                        to="/login"
+                        to="/"
                         className="text-blue-600 font-semibold hover:underline"
                     >
                         Login

@@ -25,7 +25,7 @@ export default function Navbar() {
 
         logout();
 
-        navigate("/login");
+        navigate("/");
 
     };
 
@@ -55,7 +55,7 @@ export default function Navbar() {
 
                     <Link
                         to="/"
-                        className={active("/")}
+                        className={active("/Home")}
                     >
                         <FaHome />
                     </Link>
