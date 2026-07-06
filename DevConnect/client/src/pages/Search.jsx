@@ -80,25 +80,27 @@ export default function Search() {
                 {/* ================= REELS FIRST (INSTAGRAM STYLE) ================= */}
                 {!keyword && (
                     <div className="mt-6">
-                        <h2 className="font-bold mb-3">Reels</h2>
+    <h2 className="font-bold mb-3">Reels</h2>
 
-                        <div className="flex gap-3 overflow-x-auto">
-                            {reels.map((reel) => (
-                                <Link
-                                    key={reel._id}
-                                   to={`/reels?reel=${reel._id}`}
-                                    className="min-w-120px"
-                                >
-                                    <img
-                                        src={reel.thumbnail}
-                                        className="w-120px h-180px object-cover rounded-xl"
-                                    />
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
+    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        {reels.map((reel) => (
+            <Link
+                key={reel._id}
+                to={`/reels?reel=${reel._id}`}
+                className="flex-shrink-0 w-110px"
+            >
+                <div className="w-110px h-180px rounded-xl overflow-hidden bg-gray-200">
+                    <img
+                        src={reel.thumbnail}
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+            </Link>
+        ))}
+    </div>
+</div>
+                )
+            }
                 {/* ================= SEARCH RESULTS ================= */}
                 {keyword && (
                     <div className="mt-6">
