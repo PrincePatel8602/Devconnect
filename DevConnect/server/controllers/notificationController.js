@@ -3,27 +3,32 @@ import Notification from "../models/Notification.js";
 
 // Get Notifications
 export const getNotifications = async (req, res) => {
-
     try {
-
         const notifications = await Notification.find({
             recipient: req.user._id,
         })
             .populate("sender", "fullName username profilePic")
             .sort({ createdAt: -1 });
 
+        const unreadCount = await Notification.countDocuments({
+            recipient: req.user._id,
+            read: false,
+        });
+
         res.json({
+            success: true,
             notifications,
+            unreadCount,
         });
 
     } catch (error) {
 
         res.status(500).json({
+            success: false,
             message: error.message,
         });
 
     }
-
 };
 
 

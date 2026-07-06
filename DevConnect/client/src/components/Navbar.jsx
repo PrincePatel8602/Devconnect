@@ -1,7 +1,7 @@
-        
+ import API from "../api/axios";       
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
     FaHome,
@@ -35,6 +35,20 @@ export default function Navbar() {
             ? "text-blue-600"
             : "text-gray-600 hover:text-blue-600";
 
+    const [unreadCount, setUnreadCount] = useState(0);
+    const fetchNotifications = async () => {
+    try {
+        const res = await API.get("/notifications");
+        setUnreadCount(res.data.unreadCount);
+    } catch (err) {
+        console.log(err);
+    }
+};
+ useEffect(() => {
+        if (user) {
+            fetchNotifications();
+        }
+    }, [user]);
     return (
 
         <nav className="sticky top-0 z-50 bg-white border-b shadow-sm">
@@ -90,10 +104,11 @@ export default function Navbar() {
 
                             {/* Notification Badge */}
 
-                            <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">
-                                0
-                            </span>
-
+                            {unreadCount > 0 && (
+    <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">
+        {unreadCount > 99 ? "99+" : unreadCount}
+    </span>
+)}
                         </div>
 
                     </Link>
