@@ -76,7 +76,7 @@ export default function FollowListModal({ type, userId, onClose }) {
                             >
 
                                 <img
-                                    src={u.profilePic || "https://via.placeholder.com/44"}
+                                    src={u.profilePic || "/Ultimate.jpeg"}
                                     alt=""
                                     className="w-11 h-11 rounded-full object-cover"
                                 />

@@ -119,7 +119,7 @@ export default function Notifications() {
                                 <img
                                     src={
                                         n.sender.profilePic ||
-                                        "https://via.placeholder.com/40"
+                                        "/Ultimate.jpeg"
                                     }
                                     alt=""
                                     className="w-10 h-10 rounded-full object-cover"

@@ -96,7 +96,7 @@ export default function CommentModal({ targetType, targetId, onClose, onCommentA
                         comments.map((c) => (
                             <div key={c._id} className="flex items-start gap-3">
                                 <img
-                                    src={c.user?.profilePic || "https://via.placeholder.com/36"}
+                                    src={c.user?.profilePic || "/Ultimate.jpeg"}
                                     alt=""
                                     className="w-9 h-9 rounded-full object-cover"
                                 />
@@ -132,7 +132,7 @@ export default function CommentModal({ targetType, targetId, onClose, onCommentA
                     className="border-t px-4 py-3 flex items-center gap-2"
                 >
                     <img
-                        src={user?.profilePic || "https://via.placeholder.com/32"}
+                        src={user?.profilePic || "/Ultimate.jpeg"}
                         alt=""
                         className="w-8 h-8 rounded-full object-cover"
                     />

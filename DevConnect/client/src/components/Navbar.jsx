@@ -127,7 +127,7 @@ export default function Navbar() {
                         <img
                             src={
                                 user?.profilePic ||
-                                "https://via.placeholder.com/40"
+                                "/Ultimate.jpeg"
                             }
                             alt=""
                             className="w-8 h-8 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-blue-500"

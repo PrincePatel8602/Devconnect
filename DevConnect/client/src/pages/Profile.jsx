@@ -162,7 +162,7 @@ export default function Profile() {
                         <img
                             src={
                                 profile.profilePic ||
-                                "https://via.placeholder.com/150"
+                               "/Ultimate.jpeg"
                             }
                             alt="Profile"
                             className="w-28 h-28 md:w-36 md:h-36 rounded-full object-cover border mx-auto md:mx-0"

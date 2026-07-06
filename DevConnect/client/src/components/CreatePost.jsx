@@ -81,7 +81,7 @@ export default function CreatePost({ onPostCreated }) {
                     <img
                         src={
                             user?.profilePic ||
-                            "https://via.placeholder.com/45"
+                            "/Ultimate.jpeg"
                         }
                         alt=""
                         className="w-12 h-12 rounded-full object-cover"

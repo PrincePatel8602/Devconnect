@@ -195,7 +195,7 @@ export default function Home() {
                                             >
 
                                                 <img
-                                                    src={s.profilePic || "https://via.placeholder.com/48"}
+                                                    src={s.profilePic || "/Ultimate.jpeg"}
                                                     alt=""
                                                     className="w-12 h-12 rounded-full object-cover bg-gray-300"
                                                 />

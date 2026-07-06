@@ -198,7 +198,7 @@ export default function ReelCard({ reel, active, muted, onToggleMute, onDeleted 
                     <Link to={`/profile/${reel.user?.username}`} className="flex items-center gap-2">
 
                         <img
-                            src={reel.user?.profilePic || "https://via.placeholder.com/40"}
+                            src={reel.user?.profilePic ||"/Ultimate.jpeg"}
                             alt=""
                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
                         />

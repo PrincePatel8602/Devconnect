@@ -667,7 +667,7 @@ export default function ChatWindow({ conversation, isOnline, onBack }) {
                         <img
                             src={
                                 otherUser?.profilePic ||
-                                "https://via.placeholder.com/50"
+                                "/Ultimate.jpeg"
                             }
                             alt=""
                             className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover border"
@@ -1093,7 +1093,7 @@ export default function ChatWindow({ conversation, isOnline, onBack }) {
                     <div className="px-5 pb-2 flex items-center gap-2">
 
                         <img
-                            src={otherUser?.profilePic || "https://via.placeholder.com/28"}
+                            src={otherUser?.profilePic || "/Ultimate.jpeg"}
                             alt=""
                             className="w-6 h-6 rounded-full object-cover"
                         />

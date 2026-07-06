@@ -122,7 +122,7 @@ export default function Search() {
                                 <img
                                     src={
                                         user.profilePic ||
-                                        "https://via.placeholder.com/50"
+                                        "/Ultimate.jpeg"
                                     }
                                     className="w-12 h-12 rounded-full object-cover"
                                 />
