@@ -257,3 +257,30 @@ export const getReelComments = async (req, res) => {
         });
     }
 };
+export const getExploreReels = async (req, res) => {
+    try {
+        // 🔥 Trending reels (most likes)
+        const trending = await Reel.find()
+            .populate("user", "username fullName profilePic")
+            .sort({ likes: -1, createdAt: -1 })
+            .limit(10);
+
+        // 🆕 Recent reels
+        const recent = await Reel.find()
+            .populate("user", "username fullName profilePic")
+            .sort({ createdAt: -1 })
+            .limit(12);
+
+        res.json({
+            success: true,
+            trending,
+            recent,
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};

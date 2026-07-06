@@ -1,5 +1,5 @@
 import express from "express";
-
+import { getExploreReels } from "../controllers/reelController.js";
 import protect from "../middleware/authMiddleware.js";
 import { uploadVideo } from "../middleware/uploadMiddleware.js";
 
@@ -21,6 +21,7 @@ router.post("/", protect, uploadVideo.single("video"), createReel);
 
 // Feed (keep BEFORE /:id)
 router.get("/", getAllReels);
+router.get("/explore", getExploreReels);
 
 // User's Reels (keep BEFORE /:id)
 router.get("/user/:username", getUserReels);

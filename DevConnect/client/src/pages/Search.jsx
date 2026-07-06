@@ -78,29 +78,36 @@ export default function Search() {
                 />
 
                 {/* ================= REELS FIRST (INSTAGRAM STYLE) ================= */}
-                {!keyword && (
-                    <div className="mt-6">
-    <h2 className="font-bold mb-3">Reels</h2>
+               {/* REELS SUGGESTION (INSTAGRAM STYLE) */}
+{!keyword && (
+    <div className="mt-6">
+        <h2 className="font-semibold text-lg mb-3">Reels</h2>
 
-    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-        {reels.map((reel) => (
-            <Link
-                key={reel._id}
-                to={`/reels?reel=${reel._id}`}
-                className="flex-shrink-0 w-110px"
-            >
-                <div className="w-110px h-180px rounded-xl overflow-hidden bg-gray-200">
+        <div className="grid grid-cols-3 gap-2">
+            {reels.map((reel) => (
+                <Link
+                    key={reel._id}
+                    to="/reels"
+                    state={{ reelId: reel._id }}
+                    className="relative aspect-9/16 rounded-xl overflow-hidden bg-gray-200"
+                >
                     <img
                         src={reel.thumbnail}
                         className="w-full h-full object-cover"
                     />
-                </div>
-            </Link>
-        ))}
+
+                    {/* gradient overlay */}
+                    <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
+
+                    {/* user info */}
+                    <div className="absolute bottom-1 left-1 text-white text-xs font-medium">
+                        @{reel.user.username}
+                    </div>
+                </Link>
+            ))}
+        </div>
     </div>
-</div>
-                )
-            }
+)}
                 {/* ================= SEARCH RESULTS ================= */}
                 {keyword && (
                     <div className="mt-6">
