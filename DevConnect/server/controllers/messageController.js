@@ -106,30 +106,7 @@ await createNotification({
     type: "message",
     io: getIO(),
 });
-if (replyTo) {
 
-    const repliedMessage = await Message.findById(replyTo);
-
-    if (
-        repliedMessage &&
-        repliedMessage.sender.toString() !== req.user._id.toString()
-    ) {
-
-        await createNotification({
-
-            recipient: repliedMessage.sender,
-
-            sender: req.user._id,
-
-            type: "reply",
-
-            io: getIO(),
-
-        });
-
-    }
-
-}
         io.to(conversation._id.toString()).emit(
             "newMessage",
             message
