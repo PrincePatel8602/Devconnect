@@ -199,7 +199,7 @@ export default function ReelCard({ reel, active, muted, onToggleMute, onDeleted 
 
                         <img
                             src={reel.user?.profilePic ||"/Ultimate.jpeg"}
-                            alt=""
+                            alt="Profile"
                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
                         />
 

@@ -129,7 +129,7 @@ export default function Navbar() {
                                 user?.profilePic ||
                                 "/Ultimate.jpeg"
                             }
-                            alt=""
+                            alt="Profile"
                             className="w-8 h-8 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-blue-500"
                         />
 

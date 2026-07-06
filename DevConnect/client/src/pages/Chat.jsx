@@ -181,8 +181,8 @@ export default function Chat() {
                                     >
 
                                         <img
-                                            src={u.profilePic || "https://via.placeholder.com/44"}
-                                            alt=""
+                                            src={u.profilePic || "/Ultimate.jpeg"}
+                                            alt="Profile"
                                             className="w-11 h-11 rounded-full object-cover"
                                         />
 
@@ -234,7 +234,7 @@ export default function Chat() {
                                         <div className="relative shrink-0">
 
                                             <img
-                                                src={otherUser?.profilePic || "https://via.placeholder.com/48"}
+                                                src={otherUser?.profilePic || "/Ultimate.jpeg"}
                                                 alt={otherUser?.fullName || "User"}
                                                 className="w-14 h-14 rounded-full object-cover"
                                             />

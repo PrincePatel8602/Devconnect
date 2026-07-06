@@ -83,7 +83,7 @@ export default function CreatePost({ onPostCreated }) {
                             user?.profilePic ||
                             "/Ultimate.jpeg"
                         }
-                        alt=""
+                        alt="Profile"
                         className="w-12 h-12 rounded-full object-cover"
                     />
 
