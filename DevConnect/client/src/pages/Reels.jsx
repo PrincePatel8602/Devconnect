@@ -58,7 +58,7 @@ export default function Reels() {
         <>
             <Navbar />
 
-            <div className="bg-black min-h-[calc(100vh-73px)] flex justify-center relative">
+            <div className="bg-black min-h-[calc(100dvh-56px)] sm:min-h-[calc(100dvh-64px)] flex justify-center relative">
 
                 {loading ? (
 
@@ -81,12 +81,12 @@ export default function Reels() {
                     <div
                         ref={containerRef}
                         onScroll={handleScroll}
-                        className="h-[calc(100vh-73px)] w-full max-w-[480px] overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+                        className="h-[calc(100dvh-56px)] sm:h-[calc(100dvh-64px)] w-full max-w-[480px] overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
                     >
 
                         {reels.map((reel, index) => (
 
-                            <div key={reel._id} className="h-[calc(100vh-73px)] w-full snap-start">
+                            <div key={reel._id} className="h-[calc(100dvh-56px)] sm:h-[calc(100dvh-64px)] w-full snap-start">
 
                                 <ReelCard
                                     reel={reel}

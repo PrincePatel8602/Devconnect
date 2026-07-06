@@ -6,7 +6,7 @@ export default function PostModal({ post, onClose, onDeleted }) {
     return (
 
         <div
-            className="fixed inset-0 bg-black/70 z-[90] flex items-center justify-center p-4 overflow-y-auto"
+            className="fixed inset-0 bg-black/70 z-90 flex items-center justify-center p-4 overflow-y-auto"
             onClick={onClose}
         >
 

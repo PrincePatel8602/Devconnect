@@ -1,3 +1,4 @@
+        
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
@@ -38,20 +39,20 @@ export default function Navbar() {
 
         <nav className="sticky top-0 z-50 bg-white border-b shadow-sm">
 
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-2 sm:px-6 h-14 sm:h-16">
 
                 {/* Logo */}
 
                 <Link
-                    to="/"
-                    className="text-3xl font-extrabold text-blue-600 tracking-wide"
+                    to="/Home"
+                    className="text-lg sm:text-3xl font-extrabold text-blue-600 tracking-wide shrink-0"
                 >
                     DevConnect
                 </Link>
 
                 {/* Center Icons */}
 
-                <div className="flex items-center gap-10 text-2xl">
+                <div className="flex items-center gap-2 sm:gap-6 md:gap-10 text-lg sm:text-2xl">
 
                     <Link
                         to="/Home"
@@ -101,7 +102,7 @@ export default function Navbar() {
 
                 {/* Right Profile */}
 
-                <div className="relative">
+                <div className="relative shrink-0">
 
                     <button
                         onClick={() => setOpen(!open)}
@@ -114,7 +115,7 @@ export default function Navbar() {
                                 "https://via.placeholder.com/40"
                             }
                             alt=""
-                            className="w-11 h-11 rounded-full object-cover border-2 border-blue-500"
+                            className="w-8 h-8 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-blue-500"
                         />
 
                         <div className="hidden md:block text-left">

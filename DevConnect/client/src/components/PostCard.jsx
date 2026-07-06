@@ -235,7 +235,7 @@ export default function PostCard({ post, onDeleted }) {
                 <img
                     src={post.image}
                     alt=""
-                    className="w-full max-h-[600px] object-cover"
+                    className="w-full max-h-600px object-cover"
                 />
 
             )}

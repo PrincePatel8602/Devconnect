@@ -170,7 +170,7 @@ export default function Profile() {
 
                         <div className="flex-1">
 
-                            <div className="flex flex-col md:flex-row md:items-center gap-4">
+                            <div className="flex flex-col md:flex-row md:items-center gap-4 text-center md:text-left items-center md:items-start">
 
                                 <div>
                                     <h1 className="text-2xl font-bold">
@@ -208,7 +208,7 @@ export default function Profile() {
                             </div>
 
                             {/* Stats */}
-                            <div className="flex gap-8 mt-5">
+                            <div className="flex gap-4 sm:gap-8 mt-5 justify-center md:justify-start text-sm sm:text-base">
 
                                 <span>
                                     <b>{posts.length}</b> Posts
@@ -405,7 +405,7 @@ export default function Profile() {
                 >
 
                     <div
-                        className="relative w-full max-w-[420px] h-[85vh]"
+                        className="relative w-full max-w-[420px] h-[80dvh]"
                         onClick={(e) => e.stopPropagation()}
                     >
 
