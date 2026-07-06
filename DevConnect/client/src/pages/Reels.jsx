@@ -21,19 +21,30 @@ export default function Reels() {
     useEffect(() => {
         fetchReels();
     }, []);
-     useEffect(() => {
+   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const reelId = params.get("reel");
 
-    if (reelId && reels.length > 0) {
-        const index = reels.findIndex((r) => r._id === reelId);
-        if (index !== -1) {
-            containerRef.current.scrollTop =
-                index * containerRef.current.clientHeight;
+    if (!reelId || reels.length === 0) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
+    const index = reels.findIndex((r) => r._id === reelId);
+    if (index === -1) return;
+
+    // wait for layout to fully render
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            container.scrollTo({
+                top: index * container.clientHeight,
+                behavior: "auto",
+            });
+
             setActiveIndex(index);
-        }
-    }
-}, [reels]);
+        });
+    });
+}, [reels, location.search]); 
     const fetchReels = async () => {
 
         try {
