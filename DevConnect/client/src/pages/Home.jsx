@@ -81,7 +81,7 @@ export default function Home() {
     }
 
     const sidebarLinks = [
-        { to: "/", icon: "🏠", label: "Home" },
+        { to: "/Home", icon: "🏠", label: "Home" },
         { to: "/search", icon: "🔍", label: "Search" },
         { to: "/reels", icon: "🎬", label: "Reels" },
         { to: "/chat", icon: "💬", label: "Messages" },

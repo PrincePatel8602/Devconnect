@@ -170,7 +170,7 @@ export default function Profile() {
 
                         <div className="flex-1">
 
-                            <div className="flex flex-col md:flex-row md:items-center gap-4 text-center md:text-left items-center md:items-start">
+                            <div className="flex flex-col md:flex-row gap-4 text-center md:text-left items-center md:items-start">
 
                                 <div>
                                     <h1 className="text-2xl font-bold">

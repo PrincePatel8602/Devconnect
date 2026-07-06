@@ -106,7 +106,7 @@ export default function Reels() {
                     <div
                         ref={containerRef}
                         onScroll={handleScroll}
-                        className="h-[calc(100dvh-56px)] sm:h-[calc(100dvh-64px)] w-full max-w-[480px] overflow-y-scroll snap-y snap-proximity scrollbar-hide"
+                        className="h-[calc(100dvh-56px)] sm:h-[calc(100dvh-64px)] w-full max-w-480px overflow-y-scroll snap-y snap-proximity scrollbar-hide"
                     >
 
                         {reels.map((reel, index) => (
