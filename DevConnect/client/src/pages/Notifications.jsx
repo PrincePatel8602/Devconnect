@@ -26,8 +26,8 @@ const messageFor = (n) => {
         case "reaction":
             return "reacted to your message";
 
-        default:
-            return "sent you a notification";
+        /*default:
+            return "sent you a notification";*/
     }
 };
 
