@@ -17,8 +17,8 @@ const messageFor = (type) => {
             return "replied to you";
         case "reaction":
             return "reacted to your message";
-        default:
-            return "sent you a notification";
+        /*default:
+            return "sent you a notification";*/
     }
 };
 

@@ -107,7 +107,7 @@ export default function CreatePost({ onPostCreated }) {
                             <img
                                 src={preview}
                                 alt=""
-                                className="rounded-xl max-h-[500px] w-full object-cover"
+                                className="rounded-xl max-h-500px w-full object-cover"
                             />
 
                             <button

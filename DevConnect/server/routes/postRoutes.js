@@ -27,7 +27,7 @@ router.post(
 router.get(
     "/feed",
     protect,
-    getFollowingPosts
+     getAllPosts
 );
 
 // User Posts (keep BEFORE /:id)

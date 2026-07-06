@@ -400,12 +400,12 @@ export default function Profile() {
             {selectedReel && (
 
                 <div
-                    className="fixed inset-0 bg-black/80 z-[95] flex items-center justify-center"
+                    className="fixed inset-0 bg-black/80 z-95 flex items-center justify-center"
                     onClick={() => setSelectedReel(null)}
                 >
 
                     <div
-                        className="relative w-full max-w-[420px] h-[80dvh]"
+                        className="relative w-full max-w-420px h-[80dvh]"
                         onClick={(e) => e.stopPropagation()}
                     >
 
