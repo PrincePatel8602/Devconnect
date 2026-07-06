@@ -14,7 +14,7 @@ export default function Reels() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [muted, setMuted] = useState(true);
     const [showCreate, setShowCreate] = useState(false);
-
+const hasScrolledToReel = useRef(false);
     const containerRef = useRef(null);
     const location = useLocation();
 
