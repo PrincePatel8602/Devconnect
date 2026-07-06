@@ -14,7 +14,7 @@ export default function Reels() {
     const [activeIndex, setActiveIndex] = useState(0);
     const [muted, setMuted] = useState(true);
     const [showCreate, setShowCreate] = useState(false);
-const hasScrolledToReel = useRef(false);
+
     const containerRef = useRef(null);
     const location = useLocation();
 
@@ -33,17 +33,17 @@ const hasScrolledToReel = useRef(false);
     const index = reels.findIndex((r) => r._id === reelId);
     if (index === -1) return;
 
-    // prevent re-running scroll multiple times
-    if (hasScrolledToReel.current) return;
+    // wait for layout + paint
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            container.scrollTo({
+                top: index * container.clientHeight,
+                behavior: "auto",
+            });
 
-    const scrollToIndex = () => {
-        container.scrollTop = index * container.clientHeight;
-        setActiveIndex(index);
-        hasScrolledToReel.current = true;
-    };
-
-    // wait until DOM is fully ready + layout stable
-    setTimeout(scrollToIndex, 0);
+            setActiveIndex(index);
+        });
+    });
 }, [reels, location.search]);
     const fetchReels = async () => {
 
@@ -106,7 +106,7 @@ const hasScrolledToReel = useRef(false);
                     <div
                         ref={containerRef}
                         onScroll={handleScroll}
-                        className="h-[calc(100dvh-56px)] sm:h-[calc(100dvh-64px)] w-full max-w-[480px] overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+                        className="h-[calc(100dvh-56px)] sm:h-[calc(100dvh-64px)] w-full max-w-[480px] overflow-y-scroll snap-y snap-proximity scrollbar-hide"
                     >
 
                         {reels.map((reel, index) => (
