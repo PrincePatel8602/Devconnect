@@ -21,11 +21,11 @@ const hasScrolledToReel = useRef(false);
     useEffect(() => {
         fetchReels();
     }, []);
-   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const reelId = params.get("reel");
+    useEffect(() => {
+    if (!reels.length) return;
 
-    if (!reelId || reels.length === 0) return;
+    const reelId = new URLSearchParams(location.search).get("reel");
+    if (!reelId) return;
 
     const container = containerRef.current;
     if (!container) return;
@@ -33,18 +33,18 @@ const hasScrolledToReel = useRef(false);
     const index = reels.findIndex((r) => r._id === reelId);
     if (index === -1) return;
 
-    // wait for layout to fully render
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            container.scrollTo({
-                top: index * container.clientHeight,
-                behavior: "auto",
-            });
+    // prevent re-running scroll multiple times
+    if (hasScrolledToReel.current) return;
 
-            setActiveIndex(index);
-        });
-    });
-}, [reels, location.search]); 
+    const scrollToIndex = () => {
+        container.scrollTop = index * container.clientHeight;
+        setActiveIndex(index);
+        hasScrolledToReel.current = true;
+    };
+
+    // wait until DOM is fully ready + layout stable
+    setTimeout(scrollToIndex, 0);
+}, [reels, location.search]);
     const fetchReels = async () => {
 
         try {
