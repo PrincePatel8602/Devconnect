@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import API from "../api/axios";
 
 export default function EditProfile({ profile, onUpdate }) {
@@ -12,6 +13,7 @@ export default function EditProfile({ profile, onUpdate }) {
     });
 
     const [image, setImage] = useState(null);
+    const { user, updateUser } = useAuth();
 
     const handleChange = (e) => {
         setForm({
@@ -21,42 +23,64 @@ export default function EditProfile({ profile, onUpdate }) {
     };
 
     const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        e.preventDefault();
+    try {
 
-        try {
+        await API.put("/users/update", {
+            ...form,
+            skills: form.skills
+                .split(",")
+                .map(skill => skill.trim())
+        });
 
-            await API.put("/users/update", {
-    ...form,
-    skills: form.skills
-        .split(",")
-        .map(skill => skill.trim())
-});
+        // Update AuthContext immediately
+        updateUser({
+            ...user,
+            fullName: form.fullName,
+            bio: form.bio,
+            location: form.location,
+            website: form.website,
+            skills: form.skills
+                .split(",")
+                .map(skill => skill.trim()),
+        });
 
-            if (image) {
+        if (image) {
 
-                const formData = new FormData();
+            const formData = new FormData();
 
-                formData.append("image", image);
+            formData.append("image", image);
 
-                await API.put(
-                    "/users/profile-picture",
-                    formData
-                );
+            const imageRes = await API.put(
+                "/users/profile-picture",
+                formData
+            );
 
-            }
-
-            onUpdate();
-
-            alert("Profile Updated");
-
-        } catch (error) {
-
-            console.log(error);
+            updateUser({
+                ...user,
+                fullName: form.fullName,
+                bio: form.bio,
+                location: form.location,
+                website: form.website,
+                skills: form.skills
+                    .split(",")
+                    .map(skill => skill.trim()),
+                profilePic: imageRes.data.profilePic,
+            });
 
         }
 
-    };
+        onUpdate();
+
+        alert("Profile Updated");
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+};
 
     return (
 
