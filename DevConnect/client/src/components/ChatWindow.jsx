@@ -3,8 +3,31 @@ import API from "../api/axios";
 import socket from "../socket";
 import { useAuth } from "../context/AuthContext";
 import EmojiPicker from "emoji-picker-react";
+import { FiArrowLeft, FiImage, FiSend } from "react-icons/fi";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
-export default function ChatWindow({ conversation }) {
+export default function ChatWindow({ conversation, isOnline, onBack, onChangeWallpaper }) {
+
+    const isSameDay = (a, b) =>
+        new Date(a).toDateString() === new Date(b).toDateString();
+
+    const formatDateSeparator = (date) => {
+
+        const d = new Date(date);
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        if (isSameDay(d, today)) return "Today";
+        if (isSameDay(d, yesterday)) return "Yesterday";
+
+        return d.toLocaleDateString(undefined, {
+            month: "long",
+            day: "numeric",
+            year: d.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
+        });
+
+    };
 
     const { user } = useAuth();
 
@@ -24,6 +47,12 @@ export default function ChatWindow({ conversation }) {
 
     const [showEmojiPicker, setShowEmojiPicker] =
         useState(false);
+
+    const [activeMenu, setActiveMenu] = useState(null);
+    const [viewImage, setViewImage] = useState(null);
+    const [showScrollBtn, setShowScrollBtn] = useState(false);
+
+    const messagesContainerRef = useRef(null);
 
     const mediaRecorderRef = useRef(null);
     const audioChunks = useRef([]);
@@ -430,6 +459,37 @@ export default function ChatWindow({ conversation }) {
     };
 
     // ----------------------------
+    // QUICK HEART (tap the heart button with an empty composer)
+    // ----------------------------
+
+    const sendHeart = async () => {
+
+        try {
+
+            const formData = new FormData();
+
+            formData.append("conversationId", conversation._id);
+            formData.append("text", "❤️");
+
+            await API.post(
+                `/messages/${conversation._id}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+        } catch (error) {
+
+            console.log(error);
+
+        }
+
+    };
+
+    // ----------------------------
     // MARK AS SEEN
     // ----------------------------
 
@@ -585,7 +645,7 @@ export default function ChatWindow({ conversation }) {
         return (
 
         <div
-            className="flex flex-col h-[80vh] bg-cover bg-center bg-gray-50"
+            className="relative flex flex-col h-full bg-cover bg-center bg-gray-50"
             style={{
                 backgroundImage: conversation?.wallpaper
                     ? `url(${conversation.wallpaper})`
@@ -595,32 +655,55 @@ export default function ChatWindow({ conversation }) {
 
             {/* HEADER */}
 
-            <div className="sticky top-0 z-20 bg-white border-b px-5 py-3 flex items-center justify-between">
+            <div className="sticky top-0 z-20 bg-white border-b px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between gap-2">
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
 
-                    <img
-                        src={
-                            otherUser?.profilePic ||
-                            "https://via.placeholder.com/50"
-                        }
-                        alt=""
-                        className="w-11 h-11 rounded-full object-cover border"
-                    />
+                    <button
+                        onClick={onBack}
+                        className="md:hidden text-xl text-gray-700 shrink-0"
+                    >
+                        <FiArrowLeft />
+                    </button>
 
-                    <div>
+                    <div className="relative shrink-0">
 
-                        <h2 className="font-semibold text-lg">
+                        <img
+                            src={
+                                otherUser?.profilePic ||
+                                "https://via.placeholder.com/50"
+                            }
+                            alt=""
+                            className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover border"
+                        />
+
+                        {isOnline && (
+                            <span className="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-green-500 border-2 border-white"></span>
+                        )}
+
+                    </div>
+
+                    <div className="min-w-0">
+
+                        <h2 className="font-semibold text-sm sm:text-base leading-tight truncate">
                             {otherUser?.fullName}
                         </h2>
 
-                        <p className="text-sm text-gray-500">
-                            @{otherUser?.username}
+                        <p className="text-xs text-gray-500 truncate">
+                            {isOnline ? "Active now" : `@${otherUser?.username}`}
                         </p>
 
                     </div>
 
                 </div>
+
+                <button
+                    onClick={onChangeWallpaper}
+                    className="text-lg text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 shrink-0"
+                    title="Change chat theme"
+                >
+                    <FiImage />
+                </button>
 
             </div>
 
@@ -629,7 +712,7 @@ export default function ChatWindow({ conversation }) {
             {
                 messages.find(msg => msg.pinned) && (
 
-                    <div className="bg-yellow-50 border-b px-4 py-3">
+                    <div className="bg-yellow-50 border-b px-3 sm:px-4 py-2.5 sm:py-3">
 
                         <p className="text-xs font-semibold text-yellow-700">
                             📌 PINNED MESSAGE
@@ -646,14 +729,47 @@ export default function ChatWindow({ conversation }) {
 
             {/* CHAT AREA */}
 
-            <div className="flex-1 overflow-y-auto px-5 py-4">
+            <div
+                ref={messagesContainerRef}
+                onScroll={() => {
+
+                    const el = messagesContainerRef.current;
+                    if (!el) return;
+
+                    const distanceFromBottom =
+                        el.scrollHeight - el.scrollTop - el.clientHeight;
+
+                    setShowScrollBtn(distanceFromBottom > 300);
+
+                }}
+                className="flex-1 overflow-y-auto px-3 sm:px-5 py-4 relative"
+            >
 
                 {
 
-                    messages.map((msg) => (
+                    messages.map((msg, index) => {
+
+                        const prevMsg = messages[index - 1];
+
+                        const showDateSeparator =
+                            !prevMsg || !isSameDay(prevMsg.createdAt, msg.createdAt);
+
+                        const isLastMessage = index === messages.length - 1;
+
+                        return (
+                        <div key={msg._id}>
+
+                        {showDateSeparator && (
+
+                            <div className="flex justify-center my-4">
+                                <span className="bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full">
+                                    {formatDateSeparator(msg.createdAt)}
+                                </span>
+                            </div>
+
+                        )}
 
                         <div
-                            key={msg._id}
                             className={`flex mb-5 ${
                                 msg.sender?._id === user._id
                                     ? "justify-end"
@@ -661,7 +777,7 @@ export default function ChatWindow({ conversation }) {
                             }`}
                         >
 
-                            <div className="group relative max-w-[72%]">
+                            <div className="group relative max-w-[82%] sm:max-w-[72%]">
 
                                 {/* REPLY */}
 
@@ -690,16 +806,7 @@ export default function ChatWindow({ conversation }) {
                                     )
                                 }
 
-                                {/* MESSAGE BUBBLE */}
-
-                                <div
-                                    className={`rounded-3xl px-4 py-3 shadow-sm ${
-                                        msg.sender?._id === user._id
-                                            ? "bg-blue-600 text-white rounded-br-md"
-                                            : "bg-white text-gray-900 rounded-bl-md"
-                                    }`}
-                                ></div>
-                                                                {/* TEXT */}
+                                {/* TEXT BUBBLE */}
 
                                 {
                                     msg.text && (
@@ -727,19 +834,32 @@ export default function ChatWindow({ conversation }) {
 
                                         ) : (
 
-                                            <p className="whitespace-pre-wrap-break-words">
-
-                                                {msg.text}
-
-                                                {
-                                                    msg.edited && (
-                                                        <span className="ml-2 text-xs italic opacity-70">
-                                                            (edited)
-                                                        </span>
-                                                    )
+                                            <div
+                                                onDoubleClick={() =>
+                                                    reactMessage(msg._id, "❤️")
                                                 }
+                                                className={`rounded-3xl px-4 py-2.5 shadow-sm select-none cursor-pointer ${
+                                                    msg.sender?._id === user._id
+                                                        ? "bg-blue-600 text-white rounded-br-md"
+                                                        : "bg-gray-100 text-gray-900 rounded-bl-md"
+                                                }`}
+                                            >
 
-                                            </p>
+                                                <p className="whitespace-pre-wrap-break-words">
+
+                                                    {msg.text}
+
+                                                    {
+                                                        msg.edited && (
+                                                            <span className="ml-2 text-xs italic opacity-70">
+                                                                (edited)
+                                                            </span>
+                                                        )
+                                                    }
+
+                                                </p>
+
+                                            </div>
 
                                         )
 
@@ -754,7 +874,11 @@ export default function ChatWindow({ conversation }) {
                                         <img
                                             src={msg.image}
                                             alt=""
-                                            className="mt-3 rounded-2xl max-h-80 object-cover border"
+                                            onClick={() => setViewImage(msg.image)}
+                                            onDoubleClick={() =>
+                                                reactMessage(msg._id, "❤️")
+                                            }
+                                            className="mt-3 rounded-2xl max-h-80 object-cover border cursor-pointer"
                                         />
 
                                     )
@@ -777,6 +901,17 @@ export default function ChatWindow({ conversation }) {
 
                                     )
                                 }
+
+                                <button
+                                    onClick={() =>
+                                        setActiveMenu(
+                                            activeMenu === msg._id ? null : msg._id
+                                        )
+                                    }
+                                    className="text-gray-400 hover:text-gray-700 text-xs mt-1 opacity-60 hover:opacity-100"
+                                >
+                                    •••
+                                </button>
 
                                 {/* REACTIONS */}
 
@@ -805,7 +940,11 @@ export default function ChatWindow({ conversation }) {
 
                                 {/* ACTION BUTTONS */}
 
-                                <div className="hidden group-hover:flex items-center gap-2 mt-3 flex-wrap">
+                                <div
+                                    className={`${
+                                        activeMenu === msg._id ? "flex" : "hidden group-hover:flex"
+                                    } items-center gap-2 mt-3 flex-wrap`}
+                                >
 
                                     <button
                                         onClick={() =>
@@ -908,14 +1047,14 @@ export default function ChatWindow({ conversation }) {
                                     </span>
 
                                     {
-                                        msg.sender?._id === user._id && (
+                                        msg.sender?._id === user._id && isLastMessage && (
 
-                                            <span>
+                                            <span className={msg.seen ? "text-blue-500" : "text-gray-400"}>
 
                                                 {
                                                     msg.seen
-                                                        ? "✓✓ Seen"
-                                                        : "✓ Sent"
+                                                        ? "Seen"
+                                                        : "Sent"
                                                 }
 
                                             </span>
@@ -929,7 +1068,10 @@ export default function ChatWindow({ conversation }) {
 
                         </div>
 
-                    ))
+                        </div>
+                        );
+
+                    })
 
                 }
 
@@ -941,15 +1083,39 @@ export default function ChatWindow({ conversation }) {
             {
                 typing && (
 
-                    <div className="px-5 pb-2">
+                    <div className="px-5 pb-2 flex items-center gap-2">
 
-                        <p className="text-sm italic text-gray-500">
+                        <img
+                            src={otherUser?.profilePic || "https://via.placeholder.com/28"}
+                            alt=""
+                            className="w-6 h-6 rounded-full object-cover"
+                        />
 
-                            {otherUser?.fullName} is typing...
-
-                        </p>
+                        <div className="bg-gray-100 rounded-3xl px-4 py-3 flex items-center gap-1">
+                            <span className="typing-dot"></span>
+                            <span className="typing-dot"></span>
+                            <span className="typing-dot"></span>
+                        </div>
 
                     </div>
+
+                )
+            }
+
+            {/* Scroll to bottom */}
+
+            {
+                showScrollBtn && (
+
+                    <button
+                        onClick={() =>
+                            bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+                        }
+                        className="absolute bottom-24 right-6 bg-white shadow-lg border rounded-full w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50"
+                        title="Scroll to latest"
+                    >
+                        ↓
+                    </button>
 
                 )
             }
@@ -957,19 +1123,19 @@ export default function ChatWindow({ conversation }) {
             {/* Bottom Input */}
 {/* Bottom Input */}
 
-<div className="border-t bg-white px-4 py-3">
+<div className="border-t bg-white px-3 sm:px-4 py-2.5 sm:py-3">
 
     {replyMessage && (
 
-        <div className="flex justify-between items-center bg-gray-100 rounded-xl p-3 mb-3">
+        <div className="flex justify-between items-center bg-gray-100 rounded-xl p-3 mb-3 gap-2">
 
-            <div>
+            <div className="min-w-0">
 
                 <p className="text-xs text-gray-500">
                     Replying to
                 </p>
 
-                <p className="text-sm">
+                <p className="text-sm truncate">
                     {replyMessage.text}
                 </p>
 
@@ -977,7 +1143,7 @@ export default function ChatWindow({ conversation }) {
 
             <button
                 onClick={() => setReplyMessage(null)}
-                className="text-red-500"
+                className="text-red-500 shrink-0"
             >
                 ✕
             </button>
@@ -986,111 +1152,217 @@ export default function ChatWindow({ conversation }) {
 
     )}
 
-    <div className="flex items-center bg-gray-100 rounded-full px-4 py-2">
+    {image && (
 
-        {/* Message */}
+        <div className="flex items-center gap-3 bg-gray-100 rounded-xl p-2 mb-3">
 
-        <input
-            type="text"
-            placeholder="Message..."
-            value={text}
-            onChange={(e) => {
+            <img
+                src={URL.createObjectURL(image)}
+                alt=""
+                className="w-14 h-14 rounded-lg object-cover"
+            />
 
-                setText(e.target.value);
+            <p className="text-sm text-gray-600 flex-1 truncate">
+                Photo ready to send
+            </p>
 
-                socket.emit("typing", {
-                    conversationId: conversation._id,
-                    user: user.fullName,
-                });
+            <button
+                onClick={() => setImage(null)}
+                className="text-gray-500 hover:text-red-500 px-2"
+            >
+                ✕
+            </button>
 
-            }}
-            onBlur={() =>
-                socket.emit(
-                    "stopTyping",
-                    conversation._id
-                )
-            }
-            onKeyDown={(e) => {
+        </div>
 
-                if (e.key === "Enter") {
+    )}
 
-                    sendMessage();
+    {recording && (
 
+        <div className="flex items-center gap-2 bg-red-50 rounded-xl p-3 mb-3">
+
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+
+            <p className="text-sm text-red-600 flex-1">
+                Recording voice message...
+            </p>
+
+            <button
+                onClick={stopRecording}
+                className="text-xs font-semibold text-red-600 border border-red-300 rounded-full px-3 py-1"
+            >
+                Stop
+            </button>
+
+        </div>
+
+    )}
+
+    {audio && !recording && (
+
+        <div className="flex items-center gap-3 bg-gray-100 rounded-xl p-2 mb-3">
+
+            <audio controls className="flex-1 h-8">
+                <source src={URL.createObjectURL(audio)} type="audio/webm" />
+            </audio>
+
+            <button
+                onClick={() => setAudio(null)}
+                className="text-gray-500 hover:text-red-500 px-2 shrink-0"
+            >
+                ✕
+            </button>
+
+        </div>
+
+    )}
+
+    <div className="flex items-center gap-2">
+
+        <div className="flex-1 flex items-center bg-gray-100 rounded-full px-3 sm:px-4 py-2 sm:py-2.5 min-w-0">
+
+            {/* Message */}
+
+            <input
+                type="text"
+                placeholder="Message..."
+                value={text}
+                onChange={(e) => {
+
+                    setText(e.target.value);
+
+                    socket.emit("typing", {
+                        conversationId: conversation._id,
+                        user: user.fullName,
+                    });
+
+                }}
+                onBlur={() =>
+                    socket.emit(
+                        "stopTyping",
+                        conversation._id
+                    )
                 }
+                onKeyDown={(e) => {
 
-            }}
-            className="flex-1 bg-transparent outline-none px-2"
-        />
+                    if (e.key === "Enter") {
 
-        {/* Emoji */}
+                        sendMessage();
 
-        <button
-            onClick={() =>
-                setShowEmojiPicker(!showEmojiPicker)
-            }
-            className="text-2xl mx-1"
-        >
-            😊
-        </button>
+                    }
 
-        {showEmojiPicker && (
+                }}
+                className="flex-1 min-w-0 bg-transparent outline-none px-1 text-sm"
+            />
 
-            <div className="absolute bottom-20 right-20 z-50">
+            {/* Emoji */}
 
-                <EmojiPicker
-                    onEmojiClick={onEmojiClick}
+            <button
+                onClick={() =>
+                    setShowEmojiPicker(!showEmojiPicker)
+                }
+                className="text-lg sm:text-xl mx-0.5 sm:mx-1 text-gray-600 shrink-0"
+            >
+                😊
+            </button>
+
+            {showEmojiPicker && (
+
+                <div className="absolute bottom-20 inset-x-2 sm:inset-x-auto sm:right-6 z-50 flex justify-center sm:block">
+
+                    <div className="max-w-[320px] w-full">
+
+                        <EmojiPicker
+                            onEmojiClick={onEmojiClick}
+                            width="100%"
+                        />
+
+                    </div>
+
+                </div>
+
+            )}
+
+            {/* Choose Image */}
+
+            <label className="cursor-pointer text-lg sm:text-xl mx-0.5 sm:mx-1 text-gray-600 shrink-0">
+
+                <FiImage />
+
+                <input
+                    hidden
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                        setImage(e.target.files[0])
+                    }
+                />
+
+            </label>
+
+            {/* Voice */}
+
+            <button
+                onClick={
+                    recording
+                        ? stopRecording
+                        : startRecording
+                }
+                className={`mx-0.5 sm:mx-1 text-lg sm:text-xl shrink-0 ${
+                    recording
+                        ? "text-red-500"
+                        : "text-gray-600"
+                }`}
+            >
+                🎤
+            </button>
+
+        </div>
+
+        {/* Send / Quick heart */}
+
+        {text.trim() || image || audio ? (
+
+            <button
+                onClick={sendMessage}
+                className="text-blue-600 text-xl sm:text-2xl shrink-0"
+                title="Send"
+            >
+                <FiSend />
+            </button>
+
+        ) : (
+
+            <button
+                onClick={sendHeart}
+                className="text-xl sm:text-2xl shrink-0"
+                title="Send a like"
+            >
+                <FaRegHeart className="text-gray-700" />
+            </button>
+
+        )}
+
+    </div>
+
+</div>
+
+        {viewImage && (
+
+            <div
+                className="fixed inset-0 bg-black/90 z-200 flex items-center justify-center p-4"
+                onClick={() => setViewImage(null)}
+            >
+
+                <img
+                    src={viewImage}
+                    alt=""
+                    className="max-h-[90vh] max-w-full rounded-lg object-contain"
                 />
 
             </div>
 
         )}
-
-        {/* Choose Image */}
-
-        <label className="cursor-pointer text-xl mx-1">
-
-            🖼️
-
-            <input
-                hidden
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                    setImage(e.target.files[0])
-                }
-            />
-
-        </label>
-
-        {/* Voice */}
-
-        <button
-            onClick={
-                recording
-                    ? stopRecording
-                    : startRecording
-            }
-            className={`mx-1 text-xl ${
-                recording
-                    ? "text-red-500"
-                    : "text-green-600"
-            }`}
-        >
-            🎤
-        </button>
-
-        {/* Send */}
-
-        <button
-            onClick={sendMessage}
-            className="ml-2 text-blue-600 font-semibold"
-        >
-            Send
-        </button>
-
-    </div>
-
-</div>
 
         </div>
 

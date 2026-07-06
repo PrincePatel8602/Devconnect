@@ -29,9 +29,9 @@ const socketHandler = (io) => {
     socket.leave(conversationId);
 });
         // Typing
-        socket.on("typing", (conversationId) => {
+        socket.on("typing", (data) => {
 
-            socket.to(conversationId).emit("typing");
+            socket.to(data.conversationId).emit("typing", data);
 
         });
 
@@ -62,11 +62,6 @@ const socketHandler = (io) => {
             console.log("Disconnected:", socket.id);
 
         });
-        socket.on("typing", (data) => {
-
-    socket.to(data.conversationId).emit("typing", data);
-
-});
 
     });
 

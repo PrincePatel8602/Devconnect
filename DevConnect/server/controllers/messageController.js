@@ -383,7 +383,14 @@ export const reactToMessage = async (req, res) => {
             r => r.user.toString() === req.user._id.toString()
         );
 
-        if (alreadyReacted) {
+        if (alreadyReacted && alreadyReacted.emoji === emoji) {
+
+            // tapping the same reaction again removes it
+            message.reactions = message.reactions.filter(
+                r => r.user.toString() !== req.user._id.toString()
+            );
+
+        } else if (alreadyReacted) {
 
             alreadyReacted.emoji = emoji;
 
