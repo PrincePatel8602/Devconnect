@@ -5,21 +5,23 @@ export const createNotification = async ({
     sender,
     type,
     post = null,
+    reel = null,
     message = null,
+    entityType = null,
     io = null,
 }) => {
 
     if (recipient.toString() === sender.toString()) return;
 
-    const notification = await Notification.create({
-
-        recipient,
-        sender,
-        type,
-        post,
-        message,
-
-    });
+   const notification = await Notification.create({
+    recipient,
+    sender,
+    type,
+    post,
+    reel,
+    message,
+    entityType,
+});
 
     const populatedNotification =
         await Notification.findById(notification._id)

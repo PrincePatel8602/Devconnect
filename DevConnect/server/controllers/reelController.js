@@ -116,12 +116,14 @@ export const likeReel = async (req, res) => {
         } else {
             reel.likes.push(req.user._id);
 
-            await createNotification({
-                recipient: reel.user,
-                sender: req.user._id,
-                type: "like",
-                io: getIO(),
-            });
+          await createNotification({
+    recipient: reel.user,
+    sender: req.user._id,
+    type: "like",
+    reel: reel._id,
+    entityType: "reel",
+    io: getIO(),
+});
         }
 
         await reel.save();
@@ -218,11 +220,13 @@ export const addReelComment = async (req, res) => {
 
         if (reel.user.toString() !== req.user._id.toString()) {
             await createNotification({
-                recipient: reel.user,
-                sender: req.user._id,
-                type: "comment",
-                io: getIO(),
-            });
+    recipient: reel.user,
+    sender: req.user._id,
+    type: "comment",
+    reel: reel._id,
+    entityType: "reel",
+    io: getIO(),
+});
         }
 
         await comment.populate("user", "fullName username profilePic");
