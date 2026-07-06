@@ -6,7 +6,7 @@ import EmojiPicker from "emoji-picker-react";
 import { FiArrowLeft, FiImage, FiSend } from "react-icons/fi";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 
-export default function ChatWindow({ conversation, isOnline, onBack, onChangeWallpaper }) {
+export default function ChatWindow({ conversation, isOnline, onBack }) {
 
     const isSameDay = (a, b) =>
         new Date(a).toDateString() === new Date(b).toDateString();
@@ -645,12 +645,7 @@ export default function ChatWindow({ conversation, isOnline, onBack, onChangeWal
         return (
 
         <div
-            className="relative flex flex-col h-full bg-cover bg-center bg-gray-50"
-            style={{
-                backgroundImage: conversation?.wallpaper
-                    ? `url(${conversation.wallpaper})`
-                    : "none",
-            }}
+            className="relative flex flex-col h-full bg-white"
         >
 
             {/* HEADER */}
@@ -696,14 +691,6 @@ export default function ChatWindow({ conversation, isOnline, onBack, onChangeWal
                     </div>
 
                 </div>
-
-                <button
-                    onClick={onChangeWallpaper}
-                    className="text-lg text-gray-600 hover:text-gray-900 p-2 rounded-full hover:bg-gray-100 shrink-0"
-                    title="Change chat theme"
-                >
-                    <FiImage />
-                </button>
 
             </div>
 
@@ -983,21 +970,23 @@ export default function ChatWindow({ conversation, isOnline, onBack, onChangeWal
                                     </button>
 
                                     <button
-                                        onClick={() =>
-                                            setReplyMessage(msg)
-                                        }
+                                        onClick={() => {
+                                            setReplyMessage(msg);
+                                            setActiveMenu(null);
+                                        }}
                                         className="text-xs text-green-600 font-medium"
                                     >
                                         Reply
                                     </button>
 
                                     {
-                                        msg.sender?._id === user._id && (
+                                        msg.sender?._id === user._id ? (
                                             <>
                                                 <button
                                                     onClick={() => {
                                                         setEditingId(msg._id);
                                                         setEditText(msg.text);
+                                                        setActiveMenu(null);
                                                     }}
                                                     className="text-xs text-blue-600 font-medium"
                                                 >
@@ -1005,18 +994,20 @@ export default function ChatWindow({ conversation, isOnline, onBack, onChangeWal
                                                 </button>
 
                                                 <button
-                                                    onClick={() =>
-                                                        deleteMessage(msg._id)
-                                                    }
+                                                    onClick={() => {
+                                                        deleteMessage(msg._id);
+                                                        setActiveMenu(null);
+                                                    }}
                                                     className="text-xs text-red-600 font-medium"
                                                 >
                                                     Delete
                                                 </button>
 
                                                 <button
-                                                    onClick={() =>
-                                                        pinMessage(msg._id)
-                                                    }
+                                                    onClick={() => {
+                                                        pinMessage(msg._id);
+                                                        setActiveMenu(null);
+                                                    }}
                                                     className="text-xs text-yellow-600 font-medium"
                                                 >
                                                     {
@@ -1026,6 +1017,21 @@ export default function ChatWindow({ conversation, isOnline, onBack, onChangeWal
                                                     }
                                                 </button>
                                             </>
+                                        ) : (
+
+                                            <button
+                                                onClick={() => {
+                                                    setMessages((prev) =>
+                                                        prev.filter((m) => m._id !== msg._id)
+                                                    );
+                                                    setActiveMenu(null);
+                                                }}
+                                                className="text-xs text-red-600 font-medium"
+                                                title="Removes it from your view only"
+                                            >
+                                                Remove for me
+                                            </button>
+
                                         )
                                     }
 
@@ -1350,7 +1356,7 @@ export default function ChatWindow({ conversation, isOnline, onBack, onChangeWal
         {viewImage && (
 
             <div
-                className="fixed inset-0 bg-black/90 z-200 flex items-center justify-center p-4"
+                className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4"
                 onClick={() => setViewImage(null)}
             >
 

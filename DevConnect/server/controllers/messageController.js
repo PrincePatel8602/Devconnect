@@ -26,9 +26,11 @@ export const sendMessage = async (req, res) => {
         let imageUrl = "";
 
         // IMAGE UPLOAD
-        if (req.file) {
+        if (req.files?.image?.[0]) {
 
-            const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+            const imageFile = req.files.image[0];
+
+            const base64 = `data:${imageFile.mimetype};base64,${imageFile.buffer.toString("base64")}`;
 
             const result = await cloudinary.uploader.upload(base64, {
                 folder: "DevConnect/Messages",
@@ -56,6 +58,7 @@ if (req.files?.audio) {
     sender: req.user._id,
     text: text || "",
     image: imageUrl,
+    audio: audioUrl,
     replyTo: replyTo || null,
 });
 

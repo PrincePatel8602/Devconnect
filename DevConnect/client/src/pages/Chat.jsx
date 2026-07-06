@@ -50,7 +50,6 @@ export default function Chat() {
     const [selected, setSelected] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const searchInputRef = useRef(null);
-    const wallpaperInputRef = useRef(null);
 
     const fetchConversations = async () => {
         try {
@@ -94,35 +93,6 @@ export default function Chat() {
             setSelected(res.data.conversation);
             setSearch("");
             setUsers([]);
-
-        } catch (err) {
-
-            console.log(err);
-
-        }
-
-    };
-
-    const changeWallpaper = async (file) => {
-
-        if (!file || !selected) return;
-
-        try {
-
-            const formData = new FormData();
-            formData.append("wallpaper", file);
-
-            const res = await API.put(
-                `/chat/wallpaper/${selected._id}`,
-                formData
-            );
-
-            fetchConversations();
-
-            setSelected({
-                ...selected,
-                wallpaper: res.data.wallpaper,
-            });
 
         } catch (err) {
 
@@ -311,12 +281,10 @@ export default function Chat() {
                         <ChatWindow
                             key={selected._id}
                             conversation={selected}
-                            wallpaper={selected?.wallpaper}
                             isOnline={onlineUsers.includes(
                                 selected.participants.find((p) => p._id !== user?._id)?._id
                             )}
                             onBack={() => setSelected(null)}
-                            onChangeWallpaper={() => wallpaperInputRef.current?.click()}
                         />
 
                     ) : (
@@ -328,14 +296,6 @@ export default function Chat() {
                         </div>
 
                     )}
-
-                    <input
-                        ref={wallpaperInputRef}
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        onChange={(e) => changeWallpaper(e.target.files[0])}
-                    />
 
                 </div>
 
