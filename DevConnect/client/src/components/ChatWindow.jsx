@@ -644,6 +644,7 @@ export default function ChatWindow({ conversation, isOnline, onBack }) {
     };
         return (
 
+
         <div
             className="relative flex flex-col h-full bg-white"
         >

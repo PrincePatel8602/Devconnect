@@ -82,10 +82,19 @@ conversation.unreadCounts.set(
 await conversation.save();
 
         // populate sender
-       await message.populate(
-    "replyTo",
-    "text sender"
-);
+    await message.populate([
+    {
+        path: "sender",
+        select: "fullName username profilePic",
+    },
+    {
+        path: "replyTo",
+        populate: {
+            path: "sender",
+            select: "fullName username profilePic",
+        },
+    },
+]);
 
         // SOCKET EMIT (ROOM MUST MATCH FRONTEND JOIN)
         const io = getIO();
@@ -338,10 +347,19 @@ export const editMessage = async (req, res) => {
 
         await message.save();
 
-        await message.populate(
-            "sender",
-            "fullName username profilePic"
-        );
+       await message.populate([
+    {
+        path: "sender",
+        select: "fullName username profilePic",
+    },
+    {
+        path: "replyTo",
+        populate: {
+            path: "sender",
+            select: "fullName username profilePic",
+        },
+    },
+]);
 
         const io = getIO();
 
@@ -423,6 +441,19 @@ if (message.sender.toString() !== req.user._id.toString()) {
 
 }
         const io = getIO();
+        await message.populate([
+    {
+        path: "sender",
+        select: "fullName username profilePic",
+    },
+    {
+        path: "replyTo",
+        populate: {
+            path: "sender",
+            select: "fullName username profilePic",
+        },
+    },
+]);
 
         io.to(message.conversation.toString()).emit(
             "messageReaction",
@@ -461,10 +492,19 @@ export const pinMessage = async (req, res) => {
 
         await message.save();
 
-        await message.populate(
-            "sender",
-            "fullName username profilePic"
-        );
+       await message.populate([
+    {
+        path: "sender",
+        select: "fullName username profilePic",
+    },
+    {
+        path: "replyTo",
+        populate: {
+            path: "sender",
+            select: "fullName username profilePic",
+        },
+    },
+]);
 
         const io = getIO();
 
