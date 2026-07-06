@@ -5,20 +5,29 @@ import Navbar from "../components/Navbar";
 import socket from "../socket";
 import { FiTrash2, FiHeart, FiMessageCircle, FiUserPlus } from "react-icons/fi";
 
-const messageFor = (type) => {
-    switch (type) {
+const messageFor = (n) => {
+    switch (n.type) {
         case "like":
-            return "liked your post";
+            return n.entityType === "reel"
+                ? "liked your reel"
+                : "liked your post";
+
         case "comment":
-            return "commented on your post";
+            return n.entityType === "reel"
+                ? "commented on your reel"
+                : "commented on your post";
+
         case "follow":
             return "started following you";
+
         case "reply":
             return "replied to you";
+
         case "reaction":
             return "reacted to your message";
-        /*default:
-            return "sent you a notification";*/
+
+        default:
+            return "sent you a notification";
     }
 };
 
@@ -70,14 +79,17 @@ export default function Notifications() {
         markAllRead();
     }, []);
 
+    // ✅ FIXED SOCKET (NO DUPLICATES)
     useEffect(() => {
-
         socket.on("newNotification", (data) => {
-            setNotifications((prev) => [data, ...prev]);
+            setNotifications((prev) => {
+                const exists = prev.some((n) => n._id === data._id);
+                if (exists) return prev;
+                return [data, ...prev];
+            });
         });
 
         return () => socket.off("newNotification");
-
     }, []);
 
     return (
@@ -105,7 +117,10 @@ export default function Notifications() {
                                 className="flex items-center gap-3 flex-1"
                             >
                                 <img
-                                    src={n.sender.profilePic || "https://via.placeholder.com/40"}
+                                    src={
+                                        n.sender.profilePic ||
+                                        "https://via.placeholder.com/40"
+                                    }
                                     alt=""
                                     className="w-10 h-10 rounded-full object-cover"
                                 />
@@ -113,7 +128,8 @@ export default function Notifications() {
                                 <p className="flex items-center gap-2">
                                     {iconFor(n.type)}
                                     <span>
-                                        <b>{n.sender.fullName}</b> {messageFor(n.type)}
+                                        <b>{n.sender.fullName}</b>{" "}
+                                        {messageFor(n)}
                                     </span>
                                 </p>
                             </Link>
