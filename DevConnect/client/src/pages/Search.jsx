@@ -86,7 +86,7 @@ export default function Search() {
                             {reels.map((reel) => (
                                 <Link
                                     key={reel._id}
-                                    to={`/reel/${reel._id}`}
+                                   to={`/reels?reel=${reel._id}`}
                                     className="min-w-120px"
                                 >
                                     <img

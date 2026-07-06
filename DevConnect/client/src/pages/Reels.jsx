@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import API from "../api/axios";
 import Navbar from "../components/Navbar";
 import Loader from "../components/Loader";
@@ -15,11 +16,24 @@ export default function Reels() {
     const [showCreate, setShowCreate] = useState(false);
 
     const containerRef = useRef(null);
+    const location = useLocation();
 
     useEffect(() => {
         fetchReels();
     }, []);
+     useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const reelId = params.get("reel");
 
+    if (reelId && reels.length > 0) {
+        const index = reels.findIndex((r) => r._id === reelId);
+        if (index !== -1) {
+            containerRef.current.scrollTop =
+                index * containerRef.current.clientHeight;
+            setActiveIndex(index);
+        }
+    }
+}, [reels]);
     const fetchReels = async () => {
 
         try {

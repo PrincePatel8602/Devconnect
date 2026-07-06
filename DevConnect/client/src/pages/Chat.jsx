@@ -130,7 +130,7 @@ export default function Chat() {
 
                 {/* LEFT SIDE — conversation list */}
                 <div
-                    className={`w-full md:w-[380px] border-r flex-col ${
+                    className={`w-full md:w 380px border-r flex-col ${
                         selected ? "hidden md:flex" : "flex"
                     }`}
                 >

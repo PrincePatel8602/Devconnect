@@ -163,7 +163,7 @@ export default function ReelCard({ reel, active, muted, onToggleMute, onDeleted 
                 muted={muted}
                 playsInline
                 onClick={togglePlay}
-                className="h-full w-full max-w-[480px] object-contain bg-black cursor-pointer"
+                className="h-full w-full max-w-480px object-contain bg-black cursor-pointer"
             />
 
             {!playing && (
