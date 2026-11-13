@@ -26,9 +26,62 @@ const messageFor = (n) => {
         case "reaction":
             return "reacted to your message";
 
-        /*default:
-            return "sent you a notification";*/
+        case "message":
+            return "sent you a message";
+
+        default:
+            return "sent you a notification";
     }
+};
+
+// Text shown after the name(s). Handles counts and "and N others".
+const textFor = (g) => {
+    const n = g.items[0];
+    const others = g.senders.length - 1;
+    const who = others > 0 ? ` and ${others} other${others > 1 ? "s" : ""}` : "";
+
+    if (n.type === "message" && g.total > 1) {
+        return { who, text: `sent you ${g.total} messages` };
+    }
+    if (n.type === "comment" && g.total > 1 && others === 0) {
+        return {
+            who,
+            text: `commented ${g.total} times on your ${n.entityType === "reel" ? "reel" : "post"}`,
+        };
+    }
+    return { who, text: messageFor(n) };
+};
+
+// Merge notifications into groups:
+//  - likes / comments on the same post or reel  -> one row ("A and 3 others liked your post")
+//  - messages from the same person              -> one row ("A sent you 5 messages")
+const groupNotifications = (list) => {
+    const groups = new Map();
+
+    list.forEach((n) => {
+        const target = n.post || n.reel || "";
+        let key;
+
+        if (n.type === "like" || n.type === "comment") {
+            key = `${n.type}-${n.entityType}-${target}`;
+        } else if (n.type === "message" || n.type === "reaction") {
+            key = `${n.type}-${n.sender?._id}`;
+        } else {
+            key = n._id; // follow, reply... stay separate
+        }
+
+        if (!groups.has(key)) {
+            groups.set(key, { key, items: [], senders: [], total: 0, unread: false });
+        }
+
+        const g = groups.get(key);
+        g.items.push(n);
+        g.total += n.count || 1;
+        if (!n.read) g.unread = true;
+        if (!g.senders.some((s) => s._id === n.sender._id)) g.senders.push(n.sender);
+    });
+
+    return Array.from(groups.values()); // list is already newest-first
 };
 
 const iconFor = (type) => {
@@ -65,10 +118,11 @@ export default function Notifications() {
         }
     };
 
-    const removeNotification = async (id) => {
+    const removeGroup = async (group) => {
         try {
-            await API.delete(`/notifications/${id}`);
-            setNotifications((prev) => prev.filter((n) => n._id !== id));
+            const ids = group.items.map((n) => n._id);
+            await Promise.all(ids.map((id) => API.delete(`/notifications/${id}`)));
+            setNotifications((prev) => prev.filter((n) => !ids.includes(n._id)));
         } catch (err) {
             console.log(err);
         }
@@ -82,11 +136,12 @@ export default function Notifications() {
     // ✅ FIXED SOCKET (NO DUPLICATES)
     useEffect(() => {
         socket.on("newNotification", (data) => {
-            setNotifications((prev) => {
-                const exists = prev.some((n) => n._id === data._id);
-                if (exists) return prev;
-                return [data, ...prev];
-            });
+            // a merged notification comes back with the same _id:
+            // replace the old copy and move it to the top
+            setNotifications((prev) => [
+                data,
+                ...prev.filter((n) => n._id !== data._id),
+            ]);
         });
 
         return () => socket.off("newNotification");
@@ -107,42 +162,51 @@ export default function Notifications() {
                         No notifications yet
                     </p>
                 ) : (
-                    notifications.map((n) => (
-                        <div
-                            key={n._id}
-                            className="bg-white p-4 mb-3 shadow rounded-xl flex items-center justify-between gap-3"
-                        >
-                            <Link
-                                to={`/profile/${n.sender.username}`}
-                                className="flex items-center gap-3 flex-1"
+                    groupNotifications(notifications).map((g) => {
+                        const n = g.items[0]; // newest in the group
+                        const { who, text } = textFor(g);
+
+                        return (
+                            <div
+                                key={g.key}
+                                className="bg-white p-4 mb-3 shadow rounded-xl flex items-center justify-between gap-3"
                             >
-                                <img
-                                    src={
-                                        n.sender.profilePic ||
-                                        "/Ultimate.jpeg"
+                                <Link
+                                    to={
+                                        n.type === "message"
+                                            ? "/chat"
+                                            : `/profile/${n.sender.username}`
                                     }
-                                    alt="Profile"
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
+                                    className="flex items-center gap-3 flex-1"
+                                >
+                                    <img
+                                        src={
+                                            n.sender.profilePic ||
+                                            "/Ultimate.jpeg"
+                                        }
+                                        alt="Profile"
+                                        className="w-10 h-10 rounded-full object-cover"
+                                    />
 
-                                <p className="flex items-center gap-2">
-                                    {iconFor(n.type)}
-                                    <span>
-                                        <b>{n.sender.fullName}</b>{" "}
-                                        {messageFor(n)}
-                                    </span>
-                                </p>
-                            </Link>
+                                    <p className="flex items-center gap-2">
+                                        {iconFor(n.type)}
+                                        <span>
+                                            <b>{n.sender.fullName}</b>
+                                            {who} {text}
+                                        </span>
+                                    </p>
+                                </Link>
 
-                            <button
-                                onClick={() => removeNotification(n._id)}
-                                className="text-gray-400 hover:text-red-500"
-                                title="Delete notification"
-                            >
-                                <FiTrash2 />
-                            </button>
-                        </div>
-                    ))
+                                <button
+                                    onClick={() => removeGroup(g)}
+                                    className="text-gray-400 hover:text-red-500"
+                                    title="Delete notification"
+                                >
+                                    <FiTrash2 />
+                                </button>
+                            </div>
+                        );
+                    })
                 )}
 
             </div>

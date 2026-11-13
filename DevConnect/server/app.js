@@ -34,5 +34,22 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reels", reelRoutes);
+
+app.use((err, req, res, next) => {
+    console.error("Request error:", err);
+
+    if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(413).json({
+            success: false,
+            message: "File is too large (videos max 50MB, images max 5MB)",
+        });
+    }
+
+    res.status(err.status || 400).json({
+        success: false,
+        message: err.message || "Something went wrong",
+    });
+});
+
 export default app;
 

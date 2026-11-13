@@ -13,15 +13,34 @@ export const createNotification = async ({
 
     if (recipient.toString() === sender.toString()) return;
 
-   const notification = await Notification.create({
-    recipient,
-    sender,
-    type,
-    post,
-    reel,
-    message,
-    entityType,
-});
+   
+    let notification = await Notification.findOne({
+        recipient,
+        sender,
+        type,
+        post,
+        reel,
+    });
+
+    if (notification) {
+        
+        if (type === "message" || type === "comment" || type === "reaction") {
+            notification.count = (notification.count || 1) + 1;
+        }
+        notification.message = message;
+        notification.read = false;
+        await notification.save(); // also bumps updatedAt, so it moves to the top
+    } else {
+        notification = await Notification.create({
+            recipient,
+            sender,
+            type,
+            post,
+            reel,
+            message,
+            entityType,
+        });
+    }
 
     const populatedNotification =
         await Notification.findById(notification._id)

@@ -13,9 +13,11 @@ const notificationSchema = new mongoose.Schema({
     message: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
     entityType: { type: String, enum: ["post", "reel", "message"] },
     read: { type: Boolean, default: false },
-}, { timestamps: true });
+    // how many times this same event happened (e.g. 5 messages from one person)
+    count: { type: Number, default: 1 },
+},{ timestamps: true });
 
 const Notification = mongoose.model("Notification", notificationSchema);
 
-// ✅ DEFAULT EXPORT (IMPORTANT)
+
 export default Notification;
